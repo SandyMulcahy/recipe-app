@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Recipes">
-<title>Recipes</title>
+<meta name="apple-mobile-web-app-title" content="RecipeTap">
+<title>RecipeTap</title>
 <style>
 /* ---------- palette ---------- */
 :root{
@@ -21,6 +21,22 @@
   --muted:     rgba(255,255,255,.66);
   --faint:     rgba(255,255,255,.42);
   --pad:       22px;
+
+  /* type — content sizes are 2x the original, small caps labels ~1.4x
+     so the headers still fit across a phone. Tune here, not inline. */
+  --t-base:    20px;
+  --t-label:   17px;   /* uppercase section labels */
+  --t-chrome:  18px;   /* top bar buttons + crumbs */
+  --t-ing:     34px;   /* ingredient lines in the reader */
+  --t-ins:     38px;   /* instruction text in the reader */
+  --t-rowname: 32px;   /* recipe name in the browse list */
+  --t-rowmeta: 20px;
+  --t-wordmark:76px;
+  --t-tab:     34px;
+  --t-tabsub:  22px;
+  --t-input:   22px;
+  --t-title:   34px;
+  --t-primary: 28px;
 }
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -29,7 +45,7 @@ body{
   background:var(--bg);
   color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  font-size:17px;
+  font-size:var(--t-base);
   line-height:1.45;
   -webkit-font-smoothing:antialiased;
   overscroll-behavior:none;
@@ -51,22 +67,24 @@ button{cursor:pointer}
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:12px;
+  gap:10px;
   padding:14px var(--pad);
   border-bottom:1px solid var(--line-soft);
 }
 .topbar .crumb{
-  font-size:13px;
-  letter-spacing:.14em;
-  text-transform:uppercase;
-  color:var(--muted);
-}
-.txtbtn{
-  font-size:14px;
+  font-size:var(--t-chrome);
   letter-spacing:.1em;
   text-transform:uppercase;
   color:var(--muted);
+  white-space:nowrap;
+}
+.txtbtn{
+  font-size:var(--t-chrome);
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  color:var(--muted);
   padding:8px 2px;
+  white-space:nowrap;
   transition:color .12s;
 }
 .txtbtn:active{color:var(--text)}
@@ -81,32 +99,49 @@ button{cursor:pointer}
   flex-direction:column;
   justify-content:center;
   padding:var(--pad);
-  gap:14px;
+  gap:16px;
 }
 .wordmark{
-  font-size:44px;
+  font-size:var(--t-wordmark);
   font-weight:700;
-  letter-spacing:-.02em;
-  line-height:1.05;
-  margin-bottom:6px;
+  letter-spacing:-.03em;
+  line-height:1;
+  margin-bottom:22px;
 }
-.wordmark span{display:block;color:var(--faint);font-size:15px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;margin-top:12px}
 .tab{
   display:block;
   width:100%;
   text-align:left;
-  padding:26px 22px;
+  padding:30px 24px;
   background:var(--bg-lift);
   border:1px solid var(--line);
-  border-radius:14px;
-  font-size:21px;
+  border-radius:16px;
+  font-size:var(--t-tab);
   font-weight:600;
+  line-height:1.15;
   transition:background .12s,transform .12s;
 }
 .tab:active{background:var(--bg-deep);transform:scale(.985)}
-.tab small{display:block;font-size:14px;font-weight:400;color:var(--muted);margin-top:5px}
+.tab small{display:block;font-size:var(--t-tabsub);font-weight:400;color:var(--muted);margin-top:9px;line-height:1.3}
 
-/* ---------- browse list ---------- */
+/* ---------- browse ---------- */
+.search{
+  flex:none;
+  padding:14px var(--pad);
+  border-bottom:1px solid var(--line-soft);
+}
+.search input{
+  display:block;
+  width:100%;
+  font-size:var(--t-input);
+  padding:14px 16px;
+  background:var(--bg-deep);
+  border:1px solid var(--line);
+  border-radius:12px;
+}
+.search input::placeholder{color:rgba(255,255,255,.4)}
+.search input:focus{border-color:#fff}
+
 .list{padding:6px 0 40px}
 .row{
   display:flex;
@@ -114,22 +149,22 @@ button{cursor:pointer}
   gap:14px;
   width:100%;
   text-align:left;
-  padding:20px var(--pad);
+  padding:22px var(--pad);
   border-bottom:1px solid var(--line-soft);
   transition:background .12s;
 }
 .row:active{background:var(--bg-deep)}
-.row .name{flex:1;font-size:19px;font-weight:600}
-.row .meta{font-size:13px;color:var(--muted);margin-top:3px;font-weight:400}
+.row .name{flex:1;min-width:0;font-size:var(--t-rowname);font-weight:600;line-height:1.2}
+.row .meta{display:block;font-size:var(--t-rowmeta);color:var(--muted);margin-top:6px;font-weight:400}
 .row .del{
   flex:none;
-  font-size:13px;
-  letter-spacing:.1em;
+  font-size:var(--t-chrome);
+  letter-spacing:.07em;
   text-transform:uppercase;
   color:var(--muted);
-  padding:10px 4px 10px 12px;
+  padding:12px 4px 12px 14px;
 }
-.empty{padding:56px var(--pad);color:var(--muted);text-align:center;font-size:16px;line-height:1.6}
+.empty{padding:56px var(--pad);color:var(--muted);text-align:center;font-size:var(--t-input);line-height:1.6}
 
 /* ---------- reader ---------- */
 .reader{flex:1;display:flex;flex-direction:column;min-height:0;position:relative;user-select:none}
@@ -138,48 +173,46 @@ button{cursor:pointer}
   display:flex;
   align-items:center;
   justify-content:space-between;
+  gap:10px;
   padding:14px var(--pad);
 }
 .reader .rtitle{
-  font-size:13px;
-  letter-spacing:.12em;
+  font-size:var(--t-chrome);
+  letter-spacing:.08em;
   text-transform:uppercase;
   color:var(--muted);
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  max-width:55%;
+  min-width:0;
 }
-.reader .count{font-size:13px;letter-spacing:.12em;color:var(--muted);flex:none}
+.reader .count{font-size:var(--t-chrome);letter-spacing:.08em;color:var(--muted);flex:none}
 
 .ing{
   flex:none;
-  padding:6px var(--pad) 26px;
+  /* generous gap between the top bar and the first ingredient */
+  padding:46px var(--pad) 34px;
   border-bottom:1px solid var(--line);
-  max-height:42%;
+  max-height:46%;
   overflow-y:auto;
 }
 .ing h2, .ins h2{
-  font-size:12px;
-  letter-spacing:.18em;
+  font-size:var(--t-label);
+  letter-spacing:.16em;
   text-transform:uppercase;
   color:var(--faint);
-  margin-bottom:14px;
+  margin-bottom:20px;
   font-weight:600;
 }
 .ing ul{list-style:none}
-.ing li{
-  font-size:19px;
-  font-weight:600;
-  padding:5px 0;
-}
-.ing .none{color:var(--muted);font-size:17px;font-weight:400}
+.ing li{font-size:var(--t-ing);font-weight:600;line-height:1.25;padding:8px 0}
+.ing .none{color:var(--muted);font-size:var(--t-input);font-weight:400}
 
 .ins{
   flex:1;
   min-height:0;
   overflow-y:auto;
-  padding:26px var(--pad) 20px;
+  padding:34px var(--pad) 34px;
   /* short steps sit in the middle of the page; long ones flow from the top
      without being clipped ("safe" stops centring once content overflows) */
   display:flex;
@@ -188,17 +221,8 @@ button{cursor:pointer}
   justify-content:safe center;
 }
 .ins > *{flex:none}
-.ins p{font-size:21px;line-height:1.5;white-space:pre-wrap}
+.ins p{font-size:var(--t-ins);line-height:1.35;white-space:pre-wrap}
 
-.hint{
-  flex:none;
-  padding:12px var(--pad) 20px;
-  font-size:12px;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  color:var(--faint);
-  text-align:center;
-}
 .progress{flex:none;height:2px;background:var(--line-soft)}
 .progress i{display:block;height:100%;background:#fff;transition:width .18s ease}
 
@@ -207,44 +231,39 @@ button{cursor:pointer}
 .field{margin-bottom:26px}
 .field label{
   display:block;
-  font-size:12px;
-  letter-spacing:.18em;
+  font-size:var(--t-label);
+  letter-spacing:.16em;
   text-transform:uppercase;
   color:var(--faint);
-  margin-bottom:9px;
+  margin-bottom:11px;
   font-weight:600;
 }
 .field input, .field textarea{
   display:block;
   width:100%;
-  font-size:17px;
-  line-height:1.45;
-  padding:13px 14px;
+  font-size:var(--t-input);
+  line-height:1.4;
+  padding:14px 16px;
   background:var(--bg-deep);
   border:1px solid var(--line);
-  border-radius:10px;
+  border-radius:12px;
   resize:none;
 }
 .field input::placeholder, .field textarea::placeholder{color:rgba(255,255,255,.35)}
 .field input:focus, .field textarea:focus{border-color:#fff}
-.field input.title{font-size:22px;font-weight:600;padding:15px 14px}
+.field input.title{font-size:var(--t-title);font-weight:600;padding:16px}
 
 .card{
   background:var(--bg-lift);
   border:1px solid var(--line);
-  border-radius:14px;
-  padding:18px;
-  margin-bottom:16px;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:18px;
 }
-.card .chead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:16px;
-}
+.card .chead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px}
 .card .cnum{
-  font-size:12px;
-  letter-spacing:.18em;
+  font-size:var(--t-label);
+  letter-spacing:.16em;
   text-transform:uppercase;
   color:var(--muted);
   font-weight:600;
@@ -255,11 +274,10 @@ button{cursor:pointer}
 .addstep{
   display:block;
   width:100%;
-  padding:18px;
+  padding:22px;
   border:1px dashed var(--line);
-  border-radius:14px;
-  font-size:16px;
-  letter-spacing:.06em;
+  border-radius:16px;
+  font-size:var(--t-primary);
   color:var(--muted);
   margin-bottom:26px;
 }
@@ -268,41 +286,67 @@ button{cursor:pointer}
 .primary{
   display:block;
   width:100%;
-  padding:19px;
+  padding:22px;
   background:#fff;
   color:var(--bg);
-  border-radius:12px;
-  font-size:18px;
+  border-radius:14px;
+  font-size:var(--t-primary);
   font-weight:700;
-  letter-spacing:.02em;
 }
 .primary:active{opacity:.82}
 .primary[disabled]{opacity:.45}
 
-.note{margin-top:16px;color:var(--muted);font-size:14px;line-height:1.6}
+.note{margin-top:18px;color:var(--muted);font-size:var(--t-input);line-height:1.55}
 .err{
   margin-bottom:20px;
-  padding:14px 16px;
+  padding:16px 18px;
   border:1px solid #fff;
-  border-radius:10px;
-  font-size:15px;
+  border-radius:12px;
+  font-size:var(--t-input);
   line-height:1.5;
   word-break:break-word;
 }
 
+/* ---------- password overlay ---------- */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:var(--bg);
+  z-index:50;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:var(--pad);
+  padding-bottom:calc(var(--pad) + env(safe-area-inset-bottom));
+  overflow-y:auto;
+}
+.overlay h2{font-size:var(--t-title);font-weight:700;margin-bottom:12px;text-transform:none;letter-spacing:0;color:var(--text)}
+.overlay p.lede{color:var(--muted);font-size:var(--t-input);line-height:1.5;margin-bottom:26px}
+.overlay .row2{display:flex;gap:12px;margin-top:16px}
+.overlay .row2 .primary{flex:1}
+.ghost{
+  flex:none;
+  padding:22px 26px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  font-size:var(--t-primary);
+  color:var(--muted);
+}
+.ghost:active{color:var(--text);border-color:#fff}
+
 /* ---------- setup ---------- */
 .setup{padding:var(--pad);flex:1;display:flex;flex-direction:column;justify-content:center;overflow-y:auto}
-.setup h1{font-size:30px;font-weight:700;margin-bottom:10px}
-.setup .lede{color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:28px}
+.setup h1{font-size:var(--t-title);font-weight:700;margin-bottom:12px}
+.setup .lede{color:var(--muted);font-size:var(--t-input);line-height:1.55;margin-bottom:28px}
 .setup code{
   font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  font-size:13px;
+  font-size:.85em;
   background:var(--bg-deep);
-  padding:2px 5px;
-  border-radius:4px;
+  padding:2px 6px;
+  border-radius:5px;
 }
 
-.center{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px;letter-spacing:.1em;text-transform:uppercase}
+.center{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:var(--t-chrome);letter-spacing:.08em;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -313,18 +357,15 @@ button{cursor:pointer}
 
 /* =====================================================================
    CONFIG
-   Fill these two in to hardcode your Supabase project. Leave them empty
-   and the app will ask for them on first run and remember them on the
-   device instead.
    ===================================================================== */
-var BUILTIN_URL = "https://ezayeozsnsvvboxpkrkf.supabase.co";      // e.g. "https://abcdefgh.supabase.co"
-var BUILTIN_KEY = "sb_publishable_oeW3loG2fhYXn9sRQHtPqA_Qx414rk-";      // your project's anon / publishable key
+var BUILTIN_URL = "https://ezayeozsnsvvboxpkrkf.supabase.co";
+var BUILTIN_KEY = "sb_publishable_oeW3loG2fhYXn9sRQHtPqA_Qx414rk-";
 
 var CFG_KEY = "recipes.supabase.v1";
 var CFG = null;
 
 function loadCfg(){
-  if (BUILTIN_URL && BUILTIN_KEY) { CFG = {url:BUILTIN_URL, key:BUILTIN_KEY}; return; }
+  if (BUILTIN_URL && BUILTIN_KEY) { CFG = {url:BUILTIN_URL.replace(/\/+$/,""), key:BUILTIN_KEY}; return; }
   try { CFG = JSON.parse(localStorage.getItem(CFG_KEY) || "null"); } catch(e){ CFG = null; }
 }
 function saveCfg(url, key){
@@ -337,20 +378,34 @@ function api(path, opts){
   opts = opts || {};
   var headers = {
     "apikey": CFG.key,
-    "Authorization": "Bearer " + CFG.key,
     "Content-Type": "application/json"
   };
+  /* Legacy anon keys are JWTs and may also go in Authorization. The newer
+     sb_publishable_ keys are not, and Supabase rejects them there with
+     "Invalid JWT" — so only add the Bearer header for a real JWT. */
+  if (CFG.key.indexOf("ey") === 0) headers["Authorization"] = "Bearer " + CFG.key;
   if (opts.headers) for (var k in opts.headers) headers[k] = opts.headers[k];
+
   return fetch(CFG.url + "/rest/v1/" + path, {
     method: opts.method || "GET",
     headers: headers,
     body: opts.body
   }).then(function(r){
     return r.text().then(function(t){
-      if (!r.ok) throw new Error(t || ("HTTP " + r.status));
+      if (!r.ok){
+        var msg = t;
+        try { var j = JSON.parse(t); msg = j.message || j.hint || t; } catch(e){}
+        var err = new Error(msg || ("HTTP " + r.status));
+        err.status = r.status;
+        err.raw = t;
+        throw err;
+      }
       return t ? JSON.parse(t) : null;
     });
   });
+}
+function rpc(name, body){
+  return api("rpc/" + name, {method:"POST", body: JSON.stringify(body || {})});
 }
 
 var fetchRecipes = function(){
@@ -363,28 +418,42 @@ var createRecipe = function(title, steps){
     body: JSON.stringify({title:title, steps:steps})
   });
 };
-var deleteRecipe = function(id){
-  return api("recipes?id=eq." + encodeURIComponent(id), {method:"DELETE"});
+/* Deletion is NOT a direct DELETE — the anon role has no delete permission on
+   the table. It goes through a database function that verifies the password
+   against a bcrypt hash the anon key cannot read. */
+var deleteRecipe = function(pw, id){
+  return rpc("delete_recipe", {pw:pw, rid:id});
 };
+var checkPassword = function(pw){
+  return rpc("check_manage_password", {pw:pw});
+};
+
+function notSetUp(e){
+  /* PGRST202 = function not found in schema cache */
+  return e && (e.status === 404 || /PGRST202|Could not find the function|schema cache/i.test(e.raw || e.message || ""));
+}
 
 /* =====================================================================
    STATE
    ===================================================================== */
 var S = {
   screen: "menu",      // setup | menu | browse | reader | add
-  recipes: null,       // null = not loaded yet
+  recipes: null,
   loading: false,
   error: "",
+  q: "",
   manage: false,
+  pw: null,            // in memory only, cleared on reload
+  pwPrompt: false,
+  pwErr: "",
+  pwBusy: false,
   recipe: null,
   step: 0,
   draft: null,
   saving: false
 };
 
-function newDraft(){
-  return { title:"", steps:[{ing:"", ins:""}] };
-}
+function newDraft(){ return { title:"", steps:[{ing:"", ins:""}] }; }
 
 function go(screen){
   S.screen = screen;
@@ -409,6 +478,18 @@ function lines(s){
 }
 var app = document.getElementById("app");
 
+/* search matches the recipe name and anything written in its steps */
+function haystack(r){
+  var parts = [r.title];
+  (r.steps || []).forEach(function(s){ parts.push(s.ing || "", s.ins || ""); });
+  return parts.join(" ").toLowerCase();
+}
+function filtered(){
+  var q = S.q.trim().toLowerCase();
+  if (!q) return S.recipes || [];
+  return (S.recipes || []).filter(function(r){ return haystack(r).indexOf(q) !== -1; });
+}
+
 /* =====================================================================
    SCREENS
    ===================================================================== */
@@ -416,12 +497,12 @@ function viewSetup(){
   return '' +
   '<div class="screen"><div class="setup">' +
     '<h1>One-time setup</h1>' +
-    '<p class="lede">Paste your Supabase project URL and anon key. They are stored on this device only. See <code>SETUP.md</code> for the table to create first.</p>' +
+    '<p class="lede">Paste your Supabase project URL and publishable key. They are stored on this device only. See <code>SETUP.md</code> for the SQL to run first.</p>' +
     (S.error ? '<div class="err">' + esc(S.error) + '</div>' : '') +
     '<div class="field"><label>Project URL</label>' +
       '<input id="su-url" type="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://yourproject.supabase.co" value="' + esc(CFG ? CFG.url : "") + '"></div>' +
-    '<div class="field"><label>Anon key</label>' +
-      '<textarea id="su-key" rows="4" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="eyJhbGciOi...">' + esc(CFG ? CFG.key : "") + '</textarea></div>' +
+    '<div class="field"><label>Publishable key</label>' +
+      '<textarea id="su-key" rows="3" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="sb_publishable_...">' + esc(CFG ? CFG.key : "") + '</textarea></div>' +
     '<button class="primary" id="su-save"' + (S.loading ? " disabled" : "") + '>' + (S.loading ? "Checking" : "Connect") + '</button>' +
   '</div></div>';
 }
@@ -429,38 +510,62 @@ function viewSetup(){
 function viewMenu(){
   return '' +
   '<div class="screen"><div class="menu">' +
-    '<div class="wordmark">Recipes<span>Cook one step at a time</span></div>' +
+    '<div class="wordmark">RecipeTap</div>' +
     '<button class="tab" data-go="browse">Browse recipes<small>Pick something to cook</small></button>' +
     '<button class="tab" data-go="add">Add new recipe<small>Build it step by step</small></button>' +
   '</div></div>';
 }
 
+/* the list is rendered on its own so typing in the search box never
+   replaces the input and steals focus from the keyboard */
+function listHtml(){
+  if (S.error){
+    return '<div class="empty"><div class="err">' + esc(S.error) + '</div><button class="txtbtn" id="retry">Try again</button></div>';
+  }
+  if (S.recipes === null) return '<div class="center">Loading</div>';
+  if (!S.recipes.length) return '<div class="empty">No recipes yet.<br>Add one from the menu.</div>';
+
+  var rows = filtered();
+  if (!rows.length) return '<div class="empty">Nothing matches &ldquo;' + esc(S.q.trim()) + '&rdquo;</div>';
+
+  return '<div class="list">' + rows.map(function(r){
+    var n = (r.steps || []).length;
+    return '<button class="row" data-open="' + esc(r.id) + '">' +
+      '<span class="name">' + esc(r.title) +
+        '<span class="meta">' + n + (n === 1 ? " step" : " steps") + '</span>' +
+      '</span>' +
+      (S.manage ? '<span class="del" data-del="' + esc(r.id) + '">Delete</span>' : '') +
+    '</button>';
+  }).join("") + '</div>';
+}
+
 function viewBrowse(){
-  var head = '<div class="topbar">' +
+  return '' +
+  '<div class="screen">' +
+    '<div class="topbar">' +
       '<button class="txtbtn" data-go="menu">Menu</button>' +
       '<div class="crumb">Browse</div>' +
       '<button class="txtbtn' + (S.manage ? " on" : "") + '" id="manage">' + (S.manage ? "Done" : "Manage") + '</button>' +
-    '</div>';
+    '</div>' +
+    '<div class="search"><input id="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Search recipes" value="' + esc(S.q) + '"></div>' +
+    '<div class="body" id="listwrap">' + listHtml() + '</div>' +
+  '</div>' +
+  (S.pwPrompt ? viewPwPrompt() : "");
+}
 
-  var inner;
-  if (S.error){
-    inner = '<div class="empty"><div class="err">' + esc(S.error) + '</div><button class="txtbtn" id="retry">Try again</button></div>';
-  } else if (S.recipes === null){
-    inner = '<div class="center">Loading</div>';
-  } else if (!S.recipes.length){
-    inner = '<div class="empty">No recipes yet.<br>Add one from the menu.</div>';
-  } else {
-    inner = '<div class="list">' + S.recipes.map(function(r){
-      var n = (r.steps || []).length;
-      return '<button class="row" data-open="' + esc(r.id) + '">' +
-        '<span class="name">' + esc(r.title) +
-          '<span class="meta" style="display:block">' + n + (n === 1 ? " step" : " steps") + '</span>' +
-        '</span>' +
-        (S.manage ? '<span class="del" data-del="' + esc(r.id) + '">Delete</span>' : '') +
-      '</button>';
-    }).join("") + '</div>';
-  }
-  return '<div class="screen">' + head + '<div class="body">' + inner + '</div></div>';
+function viewPwPrompt(){
+  return '' +
+  '<div class="overlay" id="pwoverlay">' +
+    '<h2>Manage recipes</h2>' +
+    '<p class="lede">Enter the password to unlock deleting.</p>' +
+    (S.pwErr ? '<div class="err">' + esc(S.pwErr) + '</div>' : '') +
+    '<div class="field"><label>Password</label>' +
+      '<input id="pwinput" type="password" autocomplete="current-password" autocapitalize="off" spellcheck="false"></div>' +
+    '<div class="row2">' +
+      '<button class="primary" id="pwgo"' + (S.pwBusy ? " disabled" : "") + '>' + (S.pwBusy ? "Checking" : "Unlock") + '</button>' +
+      '<button class="ghost" id="pwcancel">Cancel</button>' +
+    '</div>' +
+  '</div>';
 }
 
 function viewReader(){
@@ -475,8 +580,6 @@ function viewReader(){
     ? '<ul>' + ing.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join("") + '</ul>'
     : '<div class="none">Nothing new for this step</div>';
 
-  var last = (i === total - 1);
-
   return '' +
   '<div class="screen reader" id="reader">' +
     '<div class="rbar">' +
@@ -487,7 +590,6 @@ function viewReader(){
     '<div class="progress"><i style="width:' + Math.round(((i + 1) / total) * 100) + '%"></i></div>' +
     '<div class="ing"><h2>Ingredients</h2>' + ingHtml + '</div>' +
     '<div class="ins"><h2>Step ' + (i + 1) + '</h2><p>' + esc(st.ins || "") + '</p></div>' +
-    '<div class="hint">' + (last ? "Last step" : "Tap right to continue") + '</div>' +
   '</div>';
 }
 
@@ -526,14 +628,21 @@ function viewAdd(){
 
 function render(){
   var html;
-  if (S.screen === "setup")      html = viewSetup();
-  else if (S.screen === "menu")  html = viewMenu();
-  else if (S.screen === "browse")html = viewBrowse();
-  else if (S.screen === "reader")html = viewReader();
-  else if (S.screen === "add")   html = viewAdd();
+  if (S.screen === "setup")       html = viewSetup();
+  else if (S.screen === "menu")   html = viewMenu();
+  else if (S.screen === "browse") html = viewBrowse();
+  else if (S.screen === "reader") html = viewReader();
+  else if (S.screen === "add")    html = viewAdd();
   else html = viewMenu();
   app.innerHTML = html;
   autosize();
+  var pi = document.getElementById("pwinput");
+  if (pi) pi.focus();
+}
+
+function renderList(){
+  var w = document.getElementById("listwrap");
+  if (w) w.innerHTML = listHtml();
 }
 
 function autosize(){
@@ -563,21 +672,26 @@ function syncDraftFromDom(){
 function loadList(){
   S.recipes = null;
   S.error = "";
-  render();
+  if (S.screen === "browse") renderList(); else render();
   fetchRecipes().then(function(rows){
     S.recipes = (rows || []).map(function(r){
       return {id:r.id, title:r.title, steps: Array.isArray(r.steps) ? r.steps : []};
     });
-    render();
+    renderList();
   }).catch(function(e){
     S.error = "Could not reach the database. " + e.message;
     S.recipes = [];
-    render();
+    renderList();
   });
 }
 
 app.addEventListener("input", function(e){
   var el = e.target;
+  if (el.id === "q"){
+    S.q = el.value;
+    renderList();          // list only — the input keeps focus
+    return;
+  }
   if (el.hasAttribute && el.hasAttribute("data-f")){
     var idx = parseInt(el.getAttribute("data-i"), 10);
     if (S.draft && S.draft.steps[idx]) S.draft.steps[idx][el.getAttribute("data-f")] = el.value;
@@ -588,13 +702,51 @@ app.addEventListener("input", function(e){
   }
 });
 
+/* Enter submits the password prompt */
+app.addEventListener("keydown", function(e){
+  if (e.key === "Enter" && e.target.id === "pwinput"){ e.preventDefault(); submitPassword(); }
+});
+
+function submitPassword(){
+  var el = document.getElementById("pwinput");
+  var pw = el ? el.value : "";
+  if (!pw){ S.pwErr = "Enter the password."; render(); return; }
+  S.pwBusy = true; S.pwErr = ""; render();
+  var input = document.getElementById("pwinput");
+  if (input) input.value = pw;
+
+  checkPassword(pw).then(function(okv){
+    S.pwBusy = false;
+    if (okv === true){
+      S.pw = pw;
+      S.manage = true;
+      S.pwPrompt = false;
+      S.pwErr = "";
+    } else {
+      S.pwErr = "Wrong password.";
+    }
+    render();
+  }).catch(function(e){
+    S.pwBusy = false;
+    S.pwErr = notSetUp(e)
+      ? "The manage password has not been set up yet. Run the second SQL block in SETUP.md."
+      : "Could not check the password. " + e.message;
+    render();
+  });
+}
+
 app.addEventListener("click", function(e){
   var t = e.target;
+
+  /* --- password overlay (sits above everything, handle first) --- */
+  if (t.id === "pwgo"){ submitPassword(); return; }
+  if (t.id === "pwcancel"){ S.pwPrompt = false; S.pwErr = ""; render(); return; }
+  if (S.pwPrompt && t.closest("#pwoverlay")) return;
 
   var goEl = t.closest("[data-go]");
   if (goEl){
     var dest = goEl.getAttribute("data-go");
-    if (dest === "browse"){ go("browse"); loadList(); return; }
+    if (dest === "browse"){ S.q = ""; go("browse"); loadList(); return; }
     if (dest === "add"){ S.draft = newDraft(); go("add"); return; }
     go(dest);
     return;
@@ -621,20 +773,29 @@ app.addEventListener("click", function(e){
   }
 
   /* --- browse --- */
-  if (t.id === "manage"){ S.manage = !S.manage; render(); return; }
+  if (t.id === "manage"){
+    if (S.manage){ S.manage = false; render(); return; }
+    if (S.pw){ S.manage = true; render(); return; }
+    S.pwPrompt = true; S.pwErr = ""; render();
+    return;
+  }
   if (t.id === "retry"){ loadList(); return; }
 
   var delEl = t.closest("[data-del]");
   if (delEl){
     e.stopPropagation();
     var did = delEl.getAttribute("data-del");
-    var rec = S.recipes.filter(function(r){ return r.id === did; })[0];
+    var rec = (S.recipes || []).filter(function(r){ return r.id === did; })[0];
     if (!confirm('Delete "' + (rec ? rec.title : "this recipe") + '"?')) return;
+    var keep = S.recipes;
     S.recipes = S.recipes.filter(function(r){ return r.id !== did; });
-    render();
-    deleteRecipe(did).catch(function(err){
-      S.error = "Delete failed. " + err.message;
-      loadList();
+    renderList();
+    deleteRecipe(S.pw, did).catch(function(err){
+      S.recipes = keep;
+      S.error = notSetUp(err)
+        ? "Deleting needs the SQL in SETUP.md to be run first."
+        : "Delete failed. " + err.message;
+      renderList();
     });
     return;
   }
@@ -642,7 +803,7 @@ app.addEventListener("click", function(e){
   var openEl = t.closest("[data-open]");
   if (openEl){
     var oid = openEl.getAttribute("data-open");
-    var r = S.recipes.filter(function(x){ return x.id === oid; })[0];
+    var r = (S.recipes || []).filter(function(x){ return x.id === oid; })[0];
     if (!r) return;
     if (!r.steps.length){ alert("This recipe has no steps yet."); return; }
     S.recipe = r; S.step = 0;
@@ -679,6 +840,7 @@ app.addEventListener("click", function(e){
     createRecipe(title, steps).then(function(){
       S.saving = false;
       S.draft = null;
+      S.q = "";
       go("browse");
       loadList();
     }).catch(function(err){
@@ -718,7 +880,6 @@ document.addEventListener("keydown", function(e){
   if (e.key === "Escape") go("browse");
 });
 
-/* stop double-tap zoom on the reader */
 document.addEventListener("dblclick", function(e){
   if (S.screen === "reader") e.preventDefault();
 });
