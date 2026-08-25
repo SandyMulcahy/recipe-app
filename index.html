@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#A9431F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Recipes">
+<title>Recipes</title>
+<style>
+/* ---------- palette ---------- */
+:root{
+  --bg:        #A9431F;   /* terracotta */
+  --bg-deep:   #8E3617;   /* pressed / recessed */
+  --bg-lift:   #BC5330;   /* raised surfaces */
+  --line:      rgba(255,255,255,.24);
+  --line-soft: rgba(255,255,255,.13);
+  --text:      #ffffff;
+  --muted:     rgba(255,255,255,.66);
+  --faint:     rgba(255,255,255,.42);
+  --pad:       22px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:17px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior:none;
+}
+button,input,textarea{font:inherit;color:inherit;background:none;border:none;outline:none}
+button{cursor:pointer}
+
+/* ---------- screen shell ---------- */
+#app{
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.screen{flex:1;display:flex;flex-direction:column;min-height:0}
+
+.topbar{
+  flex:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px var(--pad);
+  border-bottom:1px solid var(--line-soft);
+}
+.topbar .crumb{
+  font-size:13px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.txtbtn{
+  font-size:14px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--muted);
+  padding:8px 2px;
+  transition:color .12s;
+}
+.txtbtn:active{color:var(--text)}
+.txtbtn.on{color:var(--text)}
+
+.body{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* ---------- menu ---------- */
+.menu{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:var(--pad);
+  gap:14px;
+}
+.wordmark{
+  font-size:44px;
+  font-weight:700;
+  letter-spacing:-.02em;
+  line-height:1.05;
+  margin-bottom:6px;
+}
+.wordmark span{display:block;color:var(--faint);font-size:15px;font-weight:400;letter-spacing:.16em;text-transform:uppercase;margin-top:12px}
+.tab{
+  display:block;
+  width:100%;
+  text-align:left;
+  padding:26px 22px;
+  background:var(--bg-lift);
+  border:1px solid var(--line);
+  border-radius:14px;
+  font-size:21px;
+  font-weight:600;
+  transition:background .12s,transform .12s;
+}
+.tab:active{background:var(--bg-deep);transform:scale(.985)}
+.tab small{display:block;font-size:14px;font-weight:400;color:var(--muted);margin-top:5px}
+
+/* ---------- browse list ---------- */
+.list{padding:6px 0 40px}
+.row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  width:100%;
+  text-align:left;
+  padding:20px var(--pad);
+  border-bottom:1px solid var(--line-soft);
+  transition:background .12s;
+}
+.row:active{background:var(--bg-deep)}
+.row .name{flex:1;font-size:19px;font-weight:600}
+.row .meta{font-size:13px;color:var(--muted);margin-top:3px;font-weight:400}
+.row .del{
+  flex:none;
+  font-size:13px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--muted);
+  padding:10px 4px 10px 12px;
+}
+.empty{padding:56px var(--pad);color:var(--muted);text-align:center;font-size:16px;line-height:1.6}
+
+/* ---------- reader ---------- */
+.reader{flex:1;display:flex;flex-direction:column;min-height:0;position:relative;user-select:none}
+.reader .rbar{
+  flex:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px var(--pad);
+}
+.reader .rtitle{
+  font-size:13px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--muted);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width:55%;
+}
+.reader .count{font-size:13px;letter-spacing:.12em;color:var(--muted);flex:none}
+
+.ing{
+  flex:none;
+  padding:6px var(--pad) 26px;
+  border-bottom:1px solid var(--line);
+  max-height:42%;
+  overflow-y:auto;
+}
+.ing h2, .ins h2{
+  font-size:12px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--faint);
+  margin-bottom:14px;
+  font-weight:600;
+}
+.ing ul{list-style:none}
+.ing li{
+  font-size:19px;
+  font-weight:600;
+  padding:5px 0;
+}
+.ing .none{color:var(--muted);font-size:17px;font-weight:400}
+
+.ins{
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  padding:26px var(--pad) 20px;
+  /* short steps sit in the middle of the page; long ones flow from the top
+     without being clipped ("safe" stops centring once content overflows) */
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  justify-content:safe center;
+}
+.ins > *{flex:none}
+.ins p{font-size:21px;line-height:1.5;white-space:pre-wrap}
+
+.hint{
+  flex:none;
+  padding:12px var(--pad) 20px;
+  font-size:12px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--faint);
+  text-align:center;
+}
+.progress{flex:none;height:2px;background:var(--line-soft)}
+.progress i{display:block;height:100%;background:#fff;transition:width .18s ease}
+
+/* ---------- add form ---------- */
+.form{padding:var(--pad) var(--pad) 40px}
+.field{margin-bottom:26px}
+.field label{
+  display:block;
+  font-size:12px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--faint);
+  margin-bottom:9px;
+  font-weight:600;
+}
+.field input, .field textarea{
+  display:block;
+  width:100%;
+  font-size:17px;
+  line-height:1.45;
+  padding:13px 14px;
+  background:var(--bg-deep);
+  border:1px solid var(--line);
+  border-radius:10px;
+  resize:none;
+}
+.field input::placeholder, .field textarea::placeholder{color:rgba(255,255,255,.35)}
+.field input:focus, .field textarea:focus{border-color:#fff}
+.field input.title{font-size:22px;font-weight:600;padding:15px 14px}
+
+.card{
+  background:var(--bg-lift);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:16px;
+}
+.card .chead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:16px;
+}
+.card .cnum{
+  font-size:12px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--muted);
+  font-weight:600;
+}
+.card .field:last-child{margin-bottom:0}
+.card .field input, .card .field textarea{background:var(--bg-deep)}
+
+.addstep{
+  display:block;
+  width:100%;
+  padding:18px;
+  border:1px dashed var(--line);
+  border-radius:14px;
+  font-size:16px;
+  letter-spacing:.06em;
+  color:var(--muted);
+  margin-bottom:26px;
+}
+.addstep:active{color:var(--text);border-color:#fff}
+
+.primary{
+  display:block;
+  width:100%;
+  padding:19px;
+  background:#fff;
+  color:var(--bg);
+  border-radius:12px;
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:.02em;
+}
+.primary:active{opacity:.82}
+.primary[disabled]{opacity:.45}
+
+.note{margin-top:16px;color:var(--muted);font-size:14px;line-height:1.6}
+.err{
+  margin-bottom:20px;
+  padding:14px 16px;
+  border:1px solid #fff;
+  border-radius:10px;
+  font-size:15px;
+  line-height:1.5;
+  word-break:break-word;
+}
+
+/* ---------- setup ---------- */
+.setup{padding:var(--pad);flex:1;display:flex;flex-direction:column;justify-content:center;overflow-y:auto}
+.setup h1{font-size:30px;font-weight:700;margin-bottom:10px}
+.setup .lede{color:var(--muted);font-size:15px;line-height:1.6;margin-bottom:28px}
+.setup code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:13px;
+  background:var(--bg-deep);
+  padding:2px 5px;
+  border-radius:4px;
+}
+
+.center{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px;letter-spacing:.1em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+"use strict";
+
+/* =====================================================================
+   CONFIG
+   Fill these two in to hardcode your Supabase project. Leave them empty
+   and the app will ask for them on first run and remember them on the
+   device instead.
+   ===================================================================== */
+var BUILTIN_URL = "";      // e.g. "https://abcdefgh.supabase.co"
+var BUILTIN_KEY = "";      // your project's anon / publishable key
+
+var CFG_KEY = "recipes.supabase.v1";
+var CFG = null;
+
+function loadCfg(){
+  if (BUILTIN_URL && BUILTIN_KEY) { CFG = {url:BUILTIN_URL, key:BUILTIN_KEY}; return; }
+  try { CFG = JSON.parse(localStorage.getItem(CFG_KEY) || "null"); } catch(e){ CFG = null; }
+}
+function saveCfg(url, key){
+  CFG = {url:url.replace(/\/+$/,""), key:key};
+  try { localStorage.setItem(CFG_KEY, JSON.stringify(CFG)); } catch(e){}
+}
+
+/* ---------- Supabase REST (no SDK, plain fetch) ---------- */
+function api(path, opts){
+  opts = opts || {};
+  var headers = {
+    "apikey": CFG.key,
+    "Authorization": "Bearer " + CFG.key,
+    "Content-Type": "application/json"
+  };
+  if (opts.headers) for (var k in opts.headers) headers[k] = opts.headers[k];
+  return fetch(CFG.url + "/rest/v1/" + path, {
+    method: opts.method || "GET",
+    headers: headers,
+    body: opts.body
+  }).then(function(r){
+    return r.text().then(function(t){
+      if (!r.ok) throw new Error(t || ("HTTP " + r.status));
+      return t ? JSON.parse(t) : null;
+    });
+  });
+}
+
+var fetchRecipes = function(){
+  return api("recipes?select=id,title,steps&order=created_at.desc");
+};
+var createRecipe = function(title, steps){
+  return api("recipes", {
+    method: "POST",
+    headers: {"Prefer":"return=representation"},
+    body: JSON.stringify({title:title, steps:steps})
+  });
+};
+var deleteRecipe = function(id){
+  return api("recipes?id=eq." + encodeURIComponent(id), {method:"DELETE"});
+};
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+var S = {
+  screen: "menu",      // setup | menu | browse | reader | add
+  recipes: null,       // null = not loaded yet
+  loading: false,
+  error: "",
+  manage: false,
+  recipe: null,
+  step: 0,
+  draft: null,
+  saving: false
+};
+
+function newDraft(){
+  return { title:"", steps:[{ing:"", ins:""}] };
+}
+
+function go(screen){
+  S.screen = screen;
+  S.error = "";
+  render();
+  var b = document.querySelector(".body");
+  if (b) b.scrollTop = 0;
+}
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function lines(s){
+  return String(s || "").split("\n")
+    .map(function(x){ return x.trim(); })
+    .filter(function(x){ return x.length; });
+}
+var app = document.getElementById("app");
+
+/* =====================================================================
+   SCREENS
+   ===================================================================== */
+function viewSetup(){
+  return '' +
+  '<div class="screen"><div class="setup">' +
+    '<h1>One-time setup</h1>' +
+    '<p class="lede">Paste your Supabase project URL and anon key. They are stored on this device only. See <code>SETUP.md</code> for the table to create first.</p>' +
+    (S.error ? '<div class="err">' + esc(S.error) + '</div>' : '') +
+    '<div class="field"><label>Project URL</label>' +
+      '<input id="su-url" type="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://yourproject.supabase.co" value="' + esc(CFG ? CFG.url : "") + '"></div>' +
+    '<div class="field"><label>Anon key</label>' +
+      '<textarea id="su-key" rows="4" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="eyJhbGciOi...">' + esc(CFG ? CFG.key : "") + '</textarea></div>' +
+    '<button class="primary" id="su-save"' + (S.loading ? " disabled" : "") + '>' + (S.loading ? "Checking" : "Connect") + '</button>' +
+  '</div></div>';
+}
+
+function viewMenu(){
+  return '' +
+  '<div class="screen"><div class="menu">' +
+    '<div class="wordmark">Recipes<span>Cook one step at a time</span></div>' +
+    '<button class="tab" data-go="browse">Browse recipes<small>Pick something to cook</small></button>' +
+    '<button class="tab" data-go="add">Add new recipe<small>Build it step by step</small></button>' +
+  '</div></div>';
+}
+
+function viewBrowse(){
+  var head = '<div class="topbar">' +
+      '<button class="txtbtn" data-go="menu">Menu</button>' +
+      '<div class="crumb">Browse</div>' +
+      '<button class="txtbtn' + (S.manage ? " on" : "") + '" id="manage">' + (S.manage ? "Done" : "Manage") + '</button>' +
+    '</div>';
+
+  var inner;
+  if (S.error){
+    inner = '<div class="empty"><div class="err">' + esc(S.error) + '</div><button class="txtbtn" id="retry">Try again</button></div>';
+  } else if (S.recipes === null){
+    inner = '<div class="center">Loading</div>';
+  } else if (!S.recipes.length){
+    inner = '<div class="empty">No recipes yet.<br>Add one from the menu.</div>';
+  } else {
+    inner = '<div class="list">' + S.recipes.map(function(r){
+      var n = (r.steps || []).length;
+      return '<button class="row" data-open="' + esc(r.id) + '">' +
+        '<span class="name">' + esc(r.title) +
+          '<span class="meta" style="display:block">' + n + (n === 1 ? " step" : " steps") + '</span>' +
+        '</span>' +
+        (S.manage ? '<span class="del" data-del="' + esc(r.id) + '">Delete</span>' : '') +
+      '</button>';
+    }).join("") + '</div>';
+  }
+  return '<div class="screen">' + head + '<div class="body">' + inner + '</div></div>';
+}
+
+function viewReader(){
+  var r = S.recipe;
+  var steps = r.steps || [];
+  var total = steps.length || 1;
+  var i = Math.max(0, Math.min(S.step, total - 1));
+  var st = steps[i] || {ing:"", ins:""};
+  var ing = lines(st.ing);
+
+  var ingHtml = ing.length
+    ? '<ul>' + ing.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join("") + '</ul>'
+    : '<div class="none">Nothing new for this step</div>';
+
+  var last = (i === total - 1);
+
+  return '' +
+  '<div class="screen reader" id="reader">' +
+    '<div class="rbar">' +
+      '<button class="txtbtn" data-nohit data-go="browse">Back</button>' +
+      '<div class="rtitle">' + esc(r.title) + '</div>' +
+      '<div class="count">' + (i + 1) + ' / ' + total + '</div>' +
+    '</div>' +
+    '<div class="progress"><i style="width:' + Math.round(((i + 1) / total) * 100) + '%"></i></div>' +
+    '<div class="ing"><h2>Ingredients</h2>' + ingHtml + '</div>' +
+    '<div class="ins"><h2>Step ' + (i + 1) + '</h2><p>' + esc(st.ins || "") + '</p></div>' +
+    '<div class="hint">' + (last ? "Last step" : "Tap right to continue") + '</div>' +
+  '</div>';
+}
+
+function viewAdd(){
+  var d = S.draft;
+  var cards = d.steps.map(function(s, i){
+    return '<div class="card">' +
+      '<div class="chead"><div class="cnum">Step ' + (i + 1) + '</div>' +
+        (d.steps.length > 1 ? '<button class="txtbtn" data-rm="' + i + '">Remove</button>' : '') +
+      '</div>' +
+      '<div class="field"><label>Ingredients</label>' +
+        '<textarea rows="3" data-f="ing" data-i="' + i + '" placeholder="One per line">' + esc(s.ing) + '</textarea></div>' +
+      '<div class="field"><label>Instructions</label>' +
+        '<textarea rows="4" data-f="ins" data-i="' + i + '" placeholder="What to do">' + esc(s.ins) + '</textarea></div>' +
+    '</div>';
+  }).join("");
+
+  return '' +
+  '<div class="screen">' +
+    '<div class="topbar">' +
+      '<button class="txtbtn" data-go="menu">Cancel</button>' +
+      '<div class="crumb">New recipe</div>' +
+      '<span class="txtbtn" style="visibility:hidden">Menu</span>' +
+    '</div>' +
+    '<div class="body"><div class="form">' +
+      (S.error ? '<div class="err">' + esc(S.error) + '</div>' : '') +
+      '<div class="field"><label>Recipe name</label>' +
+        '<input class="title" id="d-title" type="text" placeholder="Untitled recipe" value="' + esc(d.title) + '"></div>' +
+      cards +
+      '<button class="addstep" id="addstep">Add step</button>' +
+      '<button class="primary" id="save"' + (S.saving ? " disabled" : "") + '>' + (S.saving ? "Saving" : "Save recipe") + '</button>' +
+      '<div class="note">Each card is one screen while you cook. Put only the ingredients you need for that step at the top.</div>' +
+    '</div></div>' +
+  '</div>';
+}
+
+function render(){
+  var html;
+  if (S.screen === "setup")      html = viewSetup();
+  else if (S.screen === "menu")  html = viewMenu();
+  else if (S.screen === "browse")html = viewBrowse();
+  else if (S.screen === "reader")html = viewReader();
+  else if (S.screen === "add")   html = viewAdd();
+  else html = viewMenu();
+  app.innerHTML = html;
+  autosize();
+}
+
+function autosize(){
+  var ts = app.querySelectorAll("textarea[data-f]");
+  for (var i = 0; i < ts.length; i++){
+    var t = ts[i];
+    t.style.height = "auto";
+    t.style.height = (t.scrollHeight + 2) + "px";
+  }
+}
+
+/* =====================================================================
+   EVENTS
+   ===================================================================== */
+function syncDraftFromDom(){
+  if (!S.draft) return;
+  var t = document.getElementById("d-title");
+  if (t) S.draft.title = t.value;
+  var ts = app.querySelectorAll("textarea[data-f]");
+  for (var i = 0; i < ts.length; i++){
+    var el = ts[i];
+    var idx = parseInt(el.getAttribute("data-i"), 10);
+    if (S.draft.steps[idx]) S.draft.steps[idx][el.getAttribute("data-f")] = el.value;
+  }
+}
+
+function loadList(){
+  S.recipes = null;
+  S.error = "";
+  render();
+  fetchRecipes().then(function(rows){
+    S.recipes = (rows || []).map(function(r){
+      return {id:r.id, title:r.title, steps: Array.isArray(r.steps) ? r.steps : []};
+    });
+    render();
+  }).catch(function(e){
+    S.error = "Could not reach the database. " + e.message;
+    S.recipes = [];
+    render();
+  });
+}
+
+app.addEventListener("input", function(e){
+  var el = e.target;
+  if (el.hasAttribute && el.hasAttribute("data-f")){
+    var idx = parseInt(el.getAttribute("data-i"), 10);
+    if (S.draft && S.draft.steps[idx]) S.draft.steps[idx][el.getAttribute("data-f")] = el.value;
+    el.style.height = "auto";
+    el.style.height = (el.scrollHeight + 2) + "px";
+  } else if (el.id === "d-title" && S.draft){
+    S.draft.title = el.value;
+  }
+});
+
+app.addEventListener("click", function(e){
+  var t = e.target;
+
+  var goEl = t.closest("[data-go]");
+  if (goEl){
+    var dest = goEl.getAttribute("data-go");
+    if (dest === "browse"){ go("browse"); loadList(); return; }
+    if (dest === "add"){ S.draft = newDraft(); go("add"); return; }
+    go(dest);
+    return;
+  }
+
+  /* --- setup --- */
+  if (t.id === "su-save"){
+    var u = (document.getElementById("su-url").value || "").trim().replace(/\/+$/,"");
+    var k = (document.getElementById("su-key").value || "").trim();
+    if (!u || !k){ S.error = "Both fields are required."; render(); return; }
+    S.loading = true; S.error = ""; render();
+    var tmp = CFG; CFG = {url:u, key:k};
+    fetchRecipes().then(function(){
+      saveCfg(u, k);
+      S.loading = false;
+      go("menu");
+    }).catch(function(err){
+      CFG = tmp;
+      S.loading = false;
+      S.error = "Could not connect. Check the URL, the key, and that the recipes table exists. " + err.message;
+      render();
+    });
+    return;
+  }
+
+  /* --- browse --- */
+  if (t.id === "manage"){ S.manage = !S.manage; render(); return; }
+  if (t.id === "retry"){ loadList(); return; }
+
+  var delEl = t.closest("[data-del]");
+  if (delEl){
+    e.stopPropagation();
+    var did = delEl.getAttribute("data-del");
+    var rec = S.recipes.filter(function(r){ return r.id === did; })[0];
+    if (!confirm('Delete "' + (rec ? rec.title : "this recipe") + '"?')) return;
+    S.recipes = S.recipes.filter(function(r){ return r.id !== did; });
+    render();
+    deleteRecipe(did).catch(function(err){
+      S.error = "Delete failed. " + err.message;
+      loadList();
+    });
+    return;
+  }
+
+  var openEl = t.closest("[data-open]");
+  if (openEl){
+    var oid = openEl.getAttribute("data-open");
+    var r = S.recipes.filter(function(x){ return x.id === oid; })[0];
+    if (!r) return;
+    if (!r.steps.length){ alert("This recipe has no steps yet."); return; }
+    S.recipe = r; S.step = 0;
+    go("reader");
+    return;
+  }
+
+  /* --- add --- */
+  if (t.id === "addstep"){
+    syncDraftFromDom();
+    S.draft.steps.push({ing:"", ins:""});
+    render();
+    var b = document.querySelector(".body");
+    if (b) b.scrollTop = b.scrollHeight;
+    return;
+  }
+  var rmEl = t.closest("[data-rm]");
+  if (rmEl){
+    syncDraftFromDom();
+    S.draft.steps.splice(parseInt(rmEl.getAttribute("data-rm"), 10), 1);
+    render();
+    return;
+  }
+  if (t.id === "save"){
+    syncDraftFromDom();
+    var d = S.draft;
+    var title = (d.title || "").trim();
+    var steps = d.steps
+      .map(function(s){ return {ing:(s.ing || "").trim(), ins:(s.ins || "").trim()}; })
+      .filter(function(s){ return s.ing || s.ins; });
+    if (!title){ S.error = "Give the recipe a name."; render(); return; }
+    if (!steps.length){ S.error = "Add at least one step."; render(); return; }
+    S.saving = true; S.error = ""; render();
+    createRecipe(title, steps).then(function(){
+      S.saving = false;
+      S.draft = null;
+      go("browse");
+      loadList();
+    }).catch(function(err){
+      S.saving = false;
+      S.error = "Could not save. " + err.message;
+      render();
+    });
+    return;
+  }
+
+  /* --- reader: tap left 35% to go back, anywhere right of that to advance ---
+     This lives at the tail of the same listener on purpose: every branch above
+     returns, so a tap that opened the reader can never also turn its first page. */
+  if (S.screen === "reader"){
+    if (t.closest("[data-nohit]")) return;
+    var rd = document.getElementById("reader");
+    if (!rd) return;
+    var rect = rd.getBoundingClientRect();
+    var x = (e.clientX != null ? e.clientX : rect.left + rect.width / 2) - rect.left;
+    step(x < rect.width * 0.35 ? -1 : 1);
+  }
+});
+
+function step(dir){
+  var total = (S.recipe.steps || []).length;
+  var next = S.step + dir;
+  if (next < 0){ S.step = 0; return; }
+  if (next > total - 1) return;
+  S.step = next;
+  render();
+}
+
+document.addEventListener("keydown", function(e){
+  if (S.screen !== "reader") return;
+  if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); step(1); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); step(-1); }
+  if (e.key === "Escape") go("browse");
+});
+
+/* stop double-tap zoom on the reader */
+document.addEventListener("dblclick", function(e){
+  if (S.screen === "reader") e.preventDefault();
+});
+
+/* =====================================================================
+   BOOT
+   ===================================================================== */
+loadCfg();
+S.screen = (CFG && CFG.url && CFG.key) ? "menu" : "setup";
+render();
+</script>
+</body>
+</html>
